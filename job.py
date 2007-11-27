@@ -25,8 +25,9 @@ class Job(object):
     root = os.getcwd()
     statKeys = ['jobId', 'startTime', 'endTime', 'retCode']
 
-    def __init__(self, jobId, script):
+    def __init__(self, jobId, script, logDir=None):
         self.jobId = jobId
+        self.logDir = logDir
 
         #Script file location
         self.script = os.path.join(self.root, script)
@@ -55,6 +56,7 @@ class Job(object):
         self.done = False
         self.running = False
         self.succeeded = False
+        self.starved = False
 
     def getFile(self, ts, extension):
         """ Opens a file based on the timestamp and extension
@@ -66,7 +68,9 @@ class Job(object):
         """ Gets a filename based on a timestamp and extension
         """
         fileName = '.'.join([str(self.jobId), str(ts), extension])
-        fileLoc = os.path.join(self.root, fileName)
+        if self.logDir is None:
+            self.logDir = self.root
+        fileLoc = os.path.join(self.logDir, fileName)
         return fileLoc
     
     def run(self):
@@ -88,6 +92,15 @@ class Job(object):
         self.pid = self.job.pid
         self.running = True
 
+    def hasStarved(self):
+        """An upstream job has failed and
+        this one cannot be reached
+        """
+
+        self.done=True
+        self.running=False
+        self.starved=True
+
     def isRunning(self):
         """Is the job running?
         """
@@ -106,16 +119,19 @@ class Job(object):
         if self.done is True:
             return self.done
 
+        print '-- Passed the done check'
         #If we're not running and not done,
         #it hasn't even started
         if self.isRunning() is False:
             return False
 
+        print ' -- Passed the isRunning check'
         #Poll the job and grab the ret code
         self.job.poll()
         if self.job.returncode is None:
             return False
 
+        print ' -- Passed the returncode check'
         #We're now done, set the status bits
         self.done = True
         self.running = False
@@ -137,6 +153,8 @@ class Job(object):
         self.out.close()
         self.err.close()
         self.stat.close()
+
+        return self.done
 
     
 

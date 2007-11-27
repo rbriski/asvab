@@ -1,0 +1,22 @@
+name: testFlow
+email: bbriski@google.com
+
+jobs:
+  - id: checkDB
+    script: t/5min_sleep_stdout_stderr.py
+
+  - id: checkSite
+    script: t/stdout_stderr_fatalexit.py
+
+  - id: loadDB
+    script: t/5min_sleep_stdout_stderr.py
+    depends_on: checkDB
+
+  - id: loadSite
+    script: t/5min_sleep_stdout_stderr.py
+    depends_on: checkSite
+
+  - id: wrapUp
+    script: t/stdout_stderr_fatalexit.py
+    depends_on: [loadDB, loadSite]
+        
