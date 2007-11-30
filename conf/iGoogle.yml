@@ -1,0 +1,8 @@
+email: bbriski@google.com
+
+jobs:
+  - id: saw
+    homedir: /home/qmm-development/sawmill/igoogle/
+    env:
+      USER: qmm-development
+    script: ./sawiGoogle.pl -merge 2007-9-1 2007-9-8 /etc/dash/data/igoogle

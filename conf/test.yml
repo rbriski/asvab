@@ -1,0 +1,9 @@
+email: bbriski@google.com
+
+jobs:
+  - id: testHomeDir
+    homedir: /usr/local/google/bbriski/
+    env:
+      USER: qmm-dev
+      HOME: /home/google
+    script: ./test.pl
