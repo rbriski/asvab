@@ -137,10 +137,6 @@ class Job(object):
         startTS = int(time.time())
         self.startTime = datetime.fromtimestamp(startTS)
 
-
-        for param in os.environ.keys():
-            print "%20s %s" % (param,os.environ[param])
-
         self.job = Popen(self.script, stdout=self._out, stderr=self._err, cwd=self.homeDir, env=self.env)
         self.pid = self.job.pid
         self.running = True

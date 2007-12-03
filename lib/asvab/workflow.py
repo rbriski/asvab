@@ -3,7 +3,8 @@
 import networkx
 from distutils.dir_util import mkpath
 from networkx import DiGraph, Graph
-from job import Job
+from asvab.job import Job
+from asvab.config import Config
 import time, os, sys
 import yaml
 import pprint
@@ -77,24 +78,13 @@ class WorkFlow(object):
         self.pidFile = os.path.join(self.flowLogRoot, "%s.pid" % self.name)
 
         #Some configuration details
-        self.conf = self._loadFlow(self.confPath)
+        self._loadFlow = Config(self.confPath)
+        self.conf = self._loadFlow()
         self.email = self.conf['email']
         self.iterPause = iterPause
 
         #Set up the DAG
         self.graph = self._buildGraph(self.conf['jobs'])
-        
-    def _loadFlow(self, path):
-        """ Loads the workflow configuration
-        """
-        try:            
-            fYaml = open(path, 'r')
-            conf = yaml.load(fYaml)
-            fYaml.close()
-            return conf
-        except yaml.scanner.ScannerError:
-            print " ** ERROR ** "
-            print "Conf file %s is screwed." % path
 
     def _buildGraph(self, jobs):
         """ Builds the workflow graph
@@ -124,11 +114,11 @@ class WorkFlow(object):
             h[id] = {}
 
             if 'homedir' not in node:
-                node['homedir'] = None
+                node['homedir'] = WorkFlow.root
             env = os.environ
             if 'env' in node:
                 env.update(node['env'])
-
+                
             job = Job(id, node['script'], homeDir=node['homedir'], logDir=self.jobLogRoot, env=env)
             h[id]['job'] = job
             if 'depends_on' in node:
@@ -235,8 +225,4 @@ class WorkFlow(object):
         for j in self.graph.successors(job):
             self.kill(j)
 
-    
 
-#js = WorkFlow('iGoogle')
-#js = WorkFlow()
-#js.run()

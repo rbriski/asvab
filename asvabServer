@@ -1,0 +1,17 @@
+#!/usr/local/bin/python
+
+import sys, os
+sys.path.append(os.path.join(sys.path[0], 'lib'))
+import getopt
+
+from asvab.workflow import WorkFlow
+
+optlist, args = getopt.getopt(sys.argv[1:], '')
+
+wf = 'default'
+if len(args) > 0:
+    wf = args[0]
+
+js = WorkFlow(wf)
+js.run()
+
