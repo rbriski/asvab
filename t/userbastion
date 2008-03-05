@@ -1,0 +1,7 @@
+#!/bin/sh
+
+ssh dwh-userbastion /bin/ls
+
+#ssh dwh-userbastion /home/wesd/datamart/test_nz.pl
+
+
