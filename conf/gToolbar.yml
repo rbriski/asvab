@@ -1,0 +1,18 @@
+<%!
+from asvab.filters import date
+%>
+email: bbriski@google.com
+
+jobs:
+  - id: loadInstall
+    homedir: /usr/local/google/dash/toolbar
+    env:
+        PWD: /usr/local/google/dash/toolbar
+    script: ./LoadInstalls.pl -load ${'today' | date('%Y-%m-%d')} ${'today' | date('%Y-%m-%d')}
+
+  - id: loadActive
+    homedir: /usr/local/google/dash/toolbar
+    env:
+        PWD: /usr/local/google/dash/toolbar
+    script: ./LoadActivePeriods.pl -load ${'today' | date('%Y-%m-%d')} ${'today' | date('%Y-%m-%d')}
+    depends_on: loadInstall

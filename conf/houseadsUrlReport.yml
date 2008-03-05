@@ -1,0 +1,9 @@
+<%!
+from asvab.filters import date
+%>
+email: bbriski@google.com
+
+jobs:
+  - id: getUrlReport
+    homedir: /usr/local/google/dash/adwords/bin
+    script: ./CustomUrlReport.pl ${'yesterday' | date('%Y-%m-%d')} ${'30 days ago' | date('%Y-%m-%d')}

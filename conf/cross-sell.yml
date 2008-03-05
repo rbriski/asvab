@@ -1,0 +1,15 @@
+email: stevesong@google.com
+
+jobs:
+  - id: crossSellGaia
+    homedir: /etl/model/cross-sell/gaia
+    env:
+      USER: jsilverstein
+    script: /bin/sh ./getSignals.sh
+
+  - id: crossSellProcess
+    homedir: /etl/model/cross-sell/scripts
+    env:
+      USER: stevesong
+    script: /usr/local/bin/python qmmModel.py large.cfg
+    depends_on: crossSellGaia

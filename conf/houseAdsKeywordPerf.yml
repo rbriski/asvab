@@ -1,0 +1,9 @@
+<%!
+from asvab.filters import date
+%>
+email: bbriski@google.com
+
+jobs:
+  - id: getKeywordPerfReport
+    homedir: /usr/local/google/dash/adwords/bin
+    script: ./CustomKeywordPerformanceReport.pl ${'last monday + 8 days' | date('%Y-%m-%d')} ${'last monday' | date('%Y-%m-%d')}
