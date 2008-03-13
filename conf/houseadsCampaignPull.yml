@@ -1,9 +1,0 @@
-<%!
-from asvab.filters import date
-%>
-email: bbriski@google.com
-
-jobs:
-  - id: getCampaignReport
-    homedir: /usr/local/google/dash/adwords/bin
-    script: ./CampaignReport.pl
