@@ -80,11 +80,18 @@ class WorkFlow(object):
         #Some configuration details
         self._loadFlow = Config(self.confPath)
         self.conf = self._loadFlow()
-        self.email = self.conf['email']
+        self.email = self.conf.get('email')
         self.iterPause = iterPause
 
         #Set up the DAG
         self.graph = self._buildGraph(self.conf['jobs'])
+
+        #Create the "latest" symlink
+        latestLink = os.path.join(self.flowLogRoot, 'latest')
+        if os.path.exists(latestLink):
+            os.remove(latestLink)
+        os.symlink(self.jobLogRoot, latestLink)
+
 
     def _buildGraph(self, jobs):
         """ Builds the workflow graph
@@ -168,11 +175,6 @@ class WorkFlow(object):
         while not done:
             done = self._walk(self.start)
             time.sleep(self.iterPause)
-
-        latestLink = os.path.join(self.flowLogRoot, 'latest')
-        if os.path.exists(latestLink):
-            os.remove(latestLink)
-        os.symlink(self.jobLogRoot, latestLink)
         
     def _walk(self, job):
         """ Walk the DAG

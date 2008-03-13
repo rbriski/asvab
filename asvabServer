@@ -2,13 +2,69 @@
 
 import sys, os
 sys.path.append(os.path.join(sys.path[0], 'lib'))
-
-
 import getopt
 
 from asvab.workflow import WorkFlow
 
 optlist, args = getopt.getopt(sys.argv[1:], '')
+
+
+def emailLogErrors(start):
+    """
+    Just sends out an email if any of the jobs fail
+
+    TODO: Make this into a Logging module
+    """
+    def hasFailures(node):
+        for child in js.graph.successors(node):
+            if not child.succeeded:
+                return True
+            checkForFailures(child)
+        return False
+    
+    def checkStatus(node, level=0, errStr=''):
+        tabs = ''.join(['-' for t in range(level*2)])
+        tabs += ' '
+        
+        for child in js.graph.successors(node):
+            status = child.succeeded and 'Succeeded' or 'Failed'
+            p.write("%s%s : %s" % (tabs, child.jobId, status))
+            f = file(child._getFileName('err'), 'r')
+            errStr += '** %s - %s\n' % (child.jobId, child._getFileName('err'))
+            errStr += '\n'.join(f.readlines())
+            f.close()
+            errStr += '\n'
+            if child.starved:
+                p.write(' (starved)')
+            p.write('\n')
+            checkStatus(child, level+1, errStr)
+        return errStr
+
+    if not hasFailures:
+        return
+    if not js.email:
+        return
+
+    SENDMAIL = '/usr/sbin/sendmail'
+    p = os.popen('%s -t' % SENDMAIL, 'w')
+    p.write('To: %s\n' % js.email)
+    p.write('Subject: ASVAB: %s errors' % js.name)
+    p.write('\n')
+    
+    p.write( '** SUMMARY **\n')
+    p.write( '*************\n\n')
+
+    errStr = checkStatus(start)
+
+    if errStr:
+        p.write('\n** ERRORS **\n')
+        p.write('*************\n\n')
+        
+    p.write(errStr)
+    sts = p.close()
+    if sts:
+        sys.stderr.write('Sendmail exit status %s' % str(sts))
+    
 
 wf = 'default'
 if len(args) > 0:
@@ -16,4 +72,8 @@ if len(args) > 0:
 
 js = WorkFlow(wf)
 js.run()
+
+emailLogErrors(js.start)
+
+
 

@@ -5,6 +5,7 @@ from datetime import datetime
 import time
 import os
 import pprint
+import yaml
 
 class Job(object):
     """ Single process job
@@ -159,10 +160,9 @@ class Job(object):
     def printStats(self):
         """Prints the stats of this job to its stats file
         """
-        pp = pprint.PrettyPrinter(stream=self._stat)
         statInfo = dict((key, getattr(self, key)) for key in self.statKeys)
-        pp.pprint(statInfo)
-
+        yaml.dump(statInfo, stream=self._stat)
+        
     def isDone(self):
         """Is the job done?
 
